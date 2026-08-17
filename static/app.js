@@ -369,6 +369,44 @@
     toast("✅ 已生成修改后存档，请下载保存到游戏目录");
   }
 
+  /* ==================== 警告弹窗 ==================== */
+  // 上传成功后必须先阅读 8 秒，才可继续加载
+  function showRiskDialog(payload) {
+    var mask = $id("risk-mask");
+    var countEl = $id("risk-count");
+    var okBtn = $id("risk-ok");
+    var remain = 8;
+    okBtn.disabled = true;
+    countEl.textContent = "请阅读 " + remain + " 秒";
+    mask.classList.add("show");
+    var timer = setInterval(function () {
+      remain -= 1;
+      if (remain > 0) {
+        countEl.textContent = "请阅读 " + remain + " 秒";
+      } else {
+        clearInterval(timer);
+        countEl.textContent = "已阅读，可继续操作";
+        okBtn.disabled = false;
+      }
+    }, 1000);
+    // 返回：打断倒计时
+    $id("risk-back").onclick = function () {
+      clearInterval(timer);
+      closeRiskDialog();
+    };
+    // 继续：倒计时结束后才可加载
+    $id("risk-ok").onclick = function () {
+      if (this.disabled) return;
+      clearInterval(timer);
+      closeRiskDialog();
+      applyLoaded(payload);
+    };
+  }
+
+  function closeRiskDialog() {
+    $id("risk-mask").classList.remove("show");
+  }
+
   /* ==================== 加载存档（上传/本地通用） ==================== */
   function applyLoaded(payload) {
     State.data = payload.data;
@@ -398,7 +436,7 @@
       fetch("/api/upload", { method: "POST", body: fd })
         .then(function (res) { return res.json(); })
         .then(function (j) {
-          if (j.ok) { applyLoaded(j); }
+          if (j.ok) { showRiskDialog(j); }
           else { toast("上传失败: " + j.error, "err"); }
         })
         .catch(function (e) { toast("网络错误: " + e, "err"); });

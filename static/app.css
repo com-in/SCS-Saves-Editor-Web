@@ -136,6 +136,22 @@ td input:focus { border-color: var(--accent); background: var(--entry); }
   min-height: 300px;
 }
 
+/* ==================== 弹窗 ==================== */
+#risk-mask {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  display: none; align-items: center; justify-content: center; z-index: 100;
+}
+#risk-mask.show { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px; width: 480px; max-width: 90vw;
+  display: flex; flex-direction: column; gap: 12px; text-align: center;
+}
+.modal h3 { margin: 0; color: var(--danger); }
+#risk-text { line-height: 1.7; text-align: left; }
+.risk-count { color: var(--text-second); font-size: 13px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
 /* ==================== toast ==================== */
 #toast-wrap { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 8px; align-items: center; }
 .toast {

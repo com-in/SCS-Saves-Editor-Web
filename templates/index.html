@@ -138,6 +138,19 @@
     </main>
   </div>
 
+  <!-- 上传风险提示弹窗 -->
+  <div id="risk-mask">
+    <div class="modal">
+      <h3>⚠️ 请务必阅读</h3>
+      <div id="risk-text">请不要将数值更改过大，会有存档损坏的风险，请在替换前确保已经备份，造成的一切损失自行承担。</div>
+      <div id="risk-count" class="risk-count">请阅读 8 秒</div>
+      <div class="modal-actions">
+        <button id="risk-back" class="ghost">返回</button>
+        <button id="risk-ok" class="ghost" disabled>我已了解，继续加载</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast-wrap"></div>
   <script src="{{ url_for('static', filename='app.js') }}?v=3"></script>
 </body>
