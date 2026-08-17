@@ -240,6 +240,7 @@
       var moneyV = safeFloat(val, 0);
       if (moneyV > 1000000) moneyV = 1000000;  // 工人金钱上限 1000000
       w.npcDataRole.money = moneyV;
+      $id("w-money").value = moneyV;  // 输入框显示也限制在上限内
     } else if (key === "intelligence" || key === "strength" || key === "focus") {
       if (!w.npcDataRole || typeof w.npcDataRole !== "object") w.npcDataRole = {};
       var npc = w.npcDataRole;
@@ -252,6 +253,7 @@
       var v = safeFloat(val, 0);
       var abilityMax = key === "strength" ? 80 : 100;  // 力量上限 80，其余能力上限 100
       if (v > abilityMax) v = abilityMax;
+      $id("w-" + key).value = v;  // 输入框显示也限制在上限内
       if (abMap[key]) abMap[key].value = v;
       else npc.abilities.push({ abilityName: cap, minValue: 1, maxValue: 4, value: v });
     } else if (key === "sick" || key === "starve" || key === "thirst" || key === "sanity" || key === "tame") {
