@@ -247,8 +247,10 @@
         if (a && typeof a === "object") abMap[String(a.abilityName || "").toLowerCase()] = a;
       });
       var cap = key.charAt(0).toUpperCase() + key.slice(1);
-      if (abMap[key]) abMap[key].value = safeFloat(val, 0);
-      else npc.abilities.push({ abilityName: cap, minValue: 1, maxValue: 4, value: safeFloat(val, 0) });
+      var v = safeFloat(val, 0);
+      if (key === "strength" && v > 80) v = 80;  // 力量上限 80
+      if (abMap[key]) abMap[key].value = v;
+      else npc.abilities.push({ abilityName: cap, minValue: 1, maxValue: 4, value: v });
     } else if (key === "sick" || key === "starve" || key === "thirst" || key === "sanity" || key === "tame") {
       var dataKey = { sick: "sickValue", starve: "starveValue", thirst: "thirstValue", sanity: "sanityValue", tame: "tameProgress" }[key];
       w[dataKey] = safeFloat(val, 0);
@@ -274,8 +276,9 @@
       });
       ["Intelligence", "Strength", "Focus"].forEach(function (name) {
         var key = name.toLowerCase();
-        if (abMap[key]) abMap[key].value = 9999;
-        else npc.abilities.push({ abilityName: name, minValue: 1, maxValue: 4, value: 9999 });
+        var v = key === "strength" ? 80 : 9999;  // 力量上限 80，其余加满
+        if (abMap[key]) abMap[key].value = v;
+        else npc.abilities.push({ abilityName: name, minValue: 1, maxValue: 4, value: v });
       });
       w.sickValue = 0;
       w.starveValue = 0;
