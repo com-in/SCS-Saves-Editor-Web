@@ -237,7 +237,9 @@
     if (!w) return;
     if (key === "money") {
       if (!w.npcDataRole || typeof w.npcDataRole !== "object") w.npcDataRole = {};
-      w.npcDataRole.money = safeFloat(val, 0);
+      var moneyV = safeFloat(val, 0);
+      if (moneyV > 1000000) moneyV = 1000000;  // 工人金钱上限 1000000
+      w.npcDataRole.money = moneyV;
     } else if (key === "intelligence" || key === "strength" || key === "focus") {
       if (!w.npcDataRole || typeof w.npcDataRole !== "object") w.npcDataRole = {};
       var npc = w.npcDataRole;
@@ -248,7 +250,8 @@
       });
       var cap = key.charAt(0).toUpperCase() + key.slice(1);
       var v = safeFloat(val, 0);
-      if (key === "strength" && v > 80) v = 80;  // 力量上限 80
+      var abilityMax = key === "strength" ? 80 : 100;  // 力量上限 80，其余能力上限 100
+      if (v > abilityMax) v = abilityMax;
       if (abMap[key]) abMap[key].value = v;
       else npc.abilities.push({ abilityName: cap, minValue: 1, maxValue: 4, value: v });
     } else if (key === "sick" || key === "starve" || key === "thirst" || key === "sanity" || key === "tame") {
@@ -276,7 +279,7 @@
       });
       ["Intelligence", "Strength", "Focus"].forEach(function (name) {
         var key = name.toLowerCase();
-        var v = key === "strength" ? 80 : 9999;  // 力量上限 80，其余加满
+        var v = key === "strength" ? 80 : 100;  // 力量上限 80，智力/专注上限 100
         if (abMap[key]) abMap[key].value = v;
         else npc.abilities.push({ abilityName: name, minValue: 1, maxValue: 4, value: v });
       });
