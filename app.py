@@ -26,46 +26,6 @@ def _no_cache(resp):
     resp.headers["Expires"] = "0"
     return resp
 
-# ==================== 工具 ====================
-# 游戏本机存档目录结构（与桌面版一致）
-# LocalLow 是 Local 的兄弟目录，不能直接 LOCALAPPDATA + "Low"
-LOCAL_LOW = os.path.join(
-    os.path.dirname(os.environ.get("LOCALAPPDATA", "")), "LocalLow")
-GAME_SLOTS = os.path.join(
-    LOCAL_LOW, "Jiao Games",
-    "Scam Center Simulator_ UnderKingdom", "slots")
-APP_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
-def _scan_saves():
-    """扫描两个默认位置，返回找到的存档路径(去重、按路径排序)。
-    仅当 Flask 运行在用户本机时才可能命中游戏存档。"""
-    found = set()
-    for d in (GAME_SLOTS, APP_DIR):
-        if os.path.isdir(d):
-            for root, _, files in os.walk(d):
-                for fn in files:
-                    if fn.lower().endswith((".es3", ".json")):
-                        found.add(os.path.join(root, fn))
-    return sorted(found)
-
-
-def _read_parse(path):
-    """读取并解析存档，返回 (data, error_msg)。失败时 data 为 None。"""
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            content = f.read()
-    except OSError as e:
-        return None, f"读取文件失败: {e}"
-    try:
-        data = json.loads(content)
-    except json.JSONDecodeError as e:
-        return None, f"文件不是标准 JSON 格式！错误: {e}"
-    if not isinstance(data, dict):
-        return None, "存档顶层结构不是 JSON 对象（应为真实 ES3 结构）。"
-    return data, None
-
-
 # ==================== 页面 ====================
 @app.route("/")
 def index():
@@ -73,38 +33,6 @@ def index():
 
 
 # ==================== API ====================
-@app.route("/api/scan_saves", methods=["GET"])
-def api_scan_saves():
-    """查找本地默认位置的存档（仅本机运行可用）。
-    返回: {ok, saves:[{name, path}], app_dir, game_dir_exist}"""
-    saves = _scan_saves()
-    return jsonify({
-        "ok": True,
-        "saves": [{"name": os.path.basename(p), "path": p} for p in saves],
-        "app_dir": APP_DIR,
-        "game_dir_exist": os.path.isdir(GAME_SLOTS),
-        "game_dir": GAME_SLOTS,
-    })
-
-
-@app.route("/api/load_local", methods=["POST"])
-def api_load_local():
-    """加载本机扫到的存档。仅允许读取 _scan_saves() 返回的路径，防止任意文件读取。"""
-    req = request.get_json(silent=True) or {}
-    path = (req.get("path") or "").strip()
-    allowed = set(_scan_saves())
-    if path not in allowed:
-        return jsonify({"ok": False, "error": "该路径不在可用的本地存档列表中。"}), 400
-    data, err = _read_parse(path)
-    if err:
-        return jsonify({"ok": False, "error": err}), 400
-    return jsonify({
-        "ok": True,
-        "fileName": os.path.basename(path),
-        "data": data,
-    })
-
-
 @app.route("/api/upload", methods=["POST"])
 def api_upload():
     """上传 .es3 / .json 存档并解析，返回可编辑的完整数据。"""

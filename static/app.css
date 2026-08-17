@@ -136,21 +136,6 @@ td input:focus { border-color: var(--accent); background: var(--entry); }
   min-height: 300px;
 }
 
-/* ==================== 弹窗 ==================== */
-#modal-mask {
-  position: fixed; inset: 0; background: rgba(0,0,0,.4);
-  display: none; align-items: center; justify-content: center; z-index: 100;
-}
-#modal-mask.show { display: flex; }
-.modal {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 8px; padding: 16px; width: 620px; max-width: 90vw;
-  max-height: 80vh; display: flex; flex-direction: column; gap: 10px;
-}
-.modal h3 { margin-bottom: 4px; }
-#find-list { flex: 1; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; max-height: 40vh; }
-.modal-actions { display: flex; justify-content: flex-end; }
-
 /* ==================== toast ==================== */
 #toast-wrap { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 8px; align-items: center; }
 .toast {

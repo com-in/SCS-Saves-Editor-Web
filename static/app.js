@@ -397,9 +397,6 @@
       this.value = "";
     });
 
-    // 查找本地存档
-    $id("btn-find").addEventListener("click", openFindDialog);
-
     // 恢复原档
     $id("btn-restore").addEventListener("click", function () {
       if (!State.original) { toast("尚未加载存档", "warn"); return; }
@@ -428,60 +425,7 @@
     $id("w-dead").addEventListener("change", onWorkerCheckboxChanged);
     $id("w-max").addEventListener("click", maxAllWorkers);
     $id("w-reset").addEventListener("click", resetWorkersStatus);
-
-    // 查找弹窗关闭
-    $id("find-close").addEventListener("click", closeFindDialog);
-    $id("modal-mask").addEventListener("click", function (e) {
-      if (e.target === this) closeFindDialog();
-    });
   }
-
-  /* ==================== 查找本地存档弹窗 ==================== */
-  function openFindDialog() {
-    var scanInfo = $id("find-scan-info");
-    var list = $id("find-list");
-    list.innerHTML = "";
-    scanInfo.textContent = "正在扫描本地存档...";
-    $id("modal-mask").classList.add("show");
-
-    fetch("/api/scan_saves")
-      .then(function (res) { return res.json(); })
-      .then(function (j) {
-        if (!j.ok) { scanInfo.textContent = "扫描失败"; return; }
-        var part1 = j.game_dir_exist ? "已找到游戏存档目录。" : "未找到游戏存档目录。";
-        scanInfo.textContent = part1 + (j.saves.length ? "找到 " + j.saves.length + " 个存档：" : "未找到本地存档（远程服务器可能无游戏存档，请改用上传）。");
-        list.innerHTML = "";
-        j.saves.forEach(function (s) {
-          var div = document.createElement("div");
-          div.className = "list-item";
-          div.textContent = s.name + "   ——   " + s.path;
-          div.title = s.path;
-          div.addEventListener("click", function () { loadLocal(s.path); });
-          list.appendChild(div);
-        });
-      })
-      .catch(function (e) { scanInfo.textContent = "扫描出错: " + e; });
-  }
-
-  function loadLocal(path) {
-    fetch("/api/load_local", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ path: path })
-    })
-      .then(function (res) { return res.json(); })
-      .then(function (j) {
-        if (j.ok) {
-          closeFindDialog();
-          applyLoaded(j);
-        } else {
-          toast("加载失败: " + j.error, "err");
-        }
-      })
-      .catch(function (e) { toast("网络错误: " + e, "err"); });
-  }
-
-  function closeFindDialog() { $id("modal-mask").classList.remove("show"); }
 
   /* ==================== 初始化 ==================== */
   function init() {
