@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>诈骗园区模拟器 - 存档修改器 (Web版)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}?v=3">
+</head>
+<body>
+  <div id="app">
+    <!-- ============ 侧边栏 ============ -->
+    <aside id="sidebar">
+      <div id="side-title">💾 ES3 存档修改器</div>
+      <nav id="nav">
+        <a class="nav-item active" data-page="basic" href="javascript:void(0)"><span class="nav-icon">📊</span><span class="nav-label">基础数据</span></a>
+        <a class="nav-item" data-page="workers" href="javascript:void(0)"><span class="nav-icon">👷</span><span class="nav-label">工人</span></a>
+        <a class="nav-item" data-page="crypto" href="javascript:void(0)"><span class="nav-icon">💎</span><span class="nav-label">加密货币</span></a>
+        <a class="nav-item" data-page="items" href="javascript:void(0)"><span class="nav-icon">📦</span><span class="nav-label">物品</span></a>
+        <a class="nav-item" data-page="placed" href="javascript:void(0)"><span class="nav-icon">🏗️</span><span class="nav-label">放置物品</span></a>
+        <a class="nav-item" data-page="upgrade" href="javascript:void(0)"><span class="nav-icon">⬆️</span><span class="nav-label">升级</span></a>
+        <a class="nav-item" data-page="other" href="javascript:void(0)"><span class="nav-icon">⚙️</span><span class="nav-label">其他</span></a>
+        <a class="nav-item fold-item" id="fold-item" href="javascript:void(0)">◀ 折叠侧边栏</a>
+      </nav>
+      <button id="theme-btn" class="ghost"><span id="theme-icon">☀️</span><span id="theme-label">亮色模式</span></button>
+    </aside>
+
+    <!-- ============ 右侧主区 ============ -->
+    <main id="main">
+      <!-- 顶部工具栏 -->
+      <div id="toolbar">
+        <button id="btn-open" class="ghost">📂 上传存档</button>
+        <button id="btn-find" class="ghost">🔍 查找本地存档</button>
+        <button id="btn-restore" class="ghost">🔄 恢复原档</button>
+        <button id="btn-download" class="ghost">💾 下载修改后存档</button>
+        <span id="file-info" class="muted"></span>
+      </div>
+
+      <!-- 隐藏文件输入 -->
+      <input type="file" id="file-input" accept=".es3,.json" hidden>
+
+      <!-- 内容区域 -->
+      <div id="content">
+
+        <!-- 首页：未加载 -->
+        <section id="page-home" class="page">
+          <div class="card">
+            <h2>📂 请先加载存档</h2>
+            <p class="hint">选择「上传存档」选择本机的 <code>.es3</code> / <code>.json</code> 存档；<br>
+              或「查找本地存档」自动扫描服务器本机游戏目录（仅本地运行 Web 时可用）。</p>
+            <p class="muted">所有编辑均在浏览器内存中完成，下载时才写回文件，不会改动你的原档。</p>
+          </div>
+        </section>
+
+        <!-- 基础数据 -->
+        <section id="page-basic" class="page">
+          <div class="grid-2">
+            <div class="card"><h3>💰 货币</h3><input id="b-currency" type="text" value="0"></div>
+            <div class="card"><h3>⭐ 等级</h3><input id="b-level" type="text" value="1"></div>
+            <div class="card"><h3>✨ 经验值</h3><input id="b-exp" type="text" value="0"></div>
+            <div class="card"><h3>📅 天数</h3><input id="b-days" type="text" value="0"></div>
+            <div class="card"><h3>⚡ 电力</h3><input id="b-electricity" type="text" value="0"></div>
+            <div class="card"><h3>🏪 店铺名称</h3><input id="b-shopname" type="text" value=""></div>
+            <div class="card"><h3>📞 呼叫数据</h3><input id="b-calldata" type="text" value="-1"></div>
+            <div class="card"><h3>🌡️ 难度 (0/1/2)</h3><input id="b-difficulty" type="text" value="1"></div>
+          </div>
+          <p class="hint">提示：修改后点击顶部【下载修改后存档】写回文件。Difficulty 为游戏难度枚举(0/1/2)。</p>
+        </section>
+
+        <!-- 工人 -->
+        <section id="page-workers" class="page">
+          <div class="w-toolbar">
+            <input id="w-search" type="text" placeholder="🔍 搜索工人名字或编号...">
+            <span id="w-count" class="muted">共 0 个工人</span>
+            <button id="w-reset" class="ghost">🔄 重置状态</button>
+            <button id="w-max" class="ghost">🔼 全部加满</button>
+          </div>
+          <div class="w-split">
+            <div id="w-list" class="list"></div>
+            <div class="w-panel">
+              <h3 id="w-title">👤 请选择一个工人</h3>
+              <div class="grid-2">
+                <div class="field"><label>💵 金钱</label><input id="w-money" type="text"></div>
+                <div class="field"><label>🧠 智力</label><input id="w-intelligence" type="text"></div>
+                <div class="field"><label>💪 力量</label><input id="w-strength" type="text"></div>
+                <div class="field"><label>🎯 专注</label><input id="w-focus" type="text"></div>
+                <div class="field"><label>🤒 疾病值</label><input id="w-sick" type="text"></div>
+                <div class="field"><label>🍗 饥饿值</label><input id="w-starve" type="text"></div>
+                <div class="field"><label>💧 口渴值</label><input id="w-thirst" type="text"></div>
+                <div class="field"><label>🧘 理智值</label><input id="w-sanity" type="text"></div>
+                <div class="field"><label>🦴 驯服进度</label><input id="w-tame" type="text"></div>
+              </div>
+              <div class="chk-row">
+                <label><input id="w-tamed" type="checkbox"> ✅ 已驯服</label>
+                <label class="danger"><input id="w-dead" type="checkbox"> 💀 已死亡</label>
+              </div>
+              <p class="hint">提示：修改数值自动写入内存，最后点击顶部【下载修改后存档】写回文件。</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 加密货币 -->
+        <section id="page-crypto" class="page">
+          <table id="crypto-table">
+            <thead><tr>
+              <th>币种</th><th>当前价格</th><th>持有量 coinAmount</th><th>均价</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+          <p class="hint">⚠️ 可在【持有量】列直接修改数量，下载时写入存档。</p>
+        </section>
+
+        <!-- 物品 -->
+        <section id="page-items" class="page">
+          <textarea id="t-items" class="json-editor" spellcheck="false"></textarea>
+          <p class="hint">⚠️ 原始 JSON，仅当了解结构时修改。</p>
+        </section>
+
+        <!-- 放置物品 -->
+        <section id="page-placed" class="page">
+          <textarea id="t-placed" class="json-editor" spellcheck="false"></textarea>
+          <p class="hint">⚠️ 原始 JSON，仅当了解结构时修改。</p>
+        </section>
+
+        <!-- 升级 -->
+        <section id="page-upgrade" class="page">
+          <table id="upgrade-table">
+            <thead><tr><th>升级项</th><th>等级 level</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <p class="hint">⚠️ 可在【等级】列直接修改数值，下载时写入存档。</p>
+        </section>
+
+        <!-- 其他 -->
+        <section id="page-other" class="page">
+          <textarea id="t-other" class="json-editor" readonly></textarea>
+          <p class="hint">整个存档结构（只读）。</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- 查找本地存档弹窗 -->
+  <div id="modal-mask">
+    <div class="modal">
+      <h3>🔍 查找本地存档</h3>
+      <div id="find-scan-info" class="muted"></div>
+      <div id="find-list" class="list"></div>
+      <div class="modal-actions">
+        <button id="find-close" class="ghost">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-wrap"></div>
+  <script src="{{ url_for('static', filename='app.js') }}?v=3"></script>
+</body>
+</html>
