@@ -1,3 +1,14 @@
 # Vercel 部署：显式指定 Flask 入口，避免误用 PySide6 桌面版 main.py
+# 同时作为合法 Python 项目，让 Vercel 的 uv lock 能正常运行并安装依赖
+[project]
+name = "scs-saves-editor-web"
+version = "1.0.0"
+description = "SCS 存档修改器 Web 版（Flask）"
+requires-python = ">=3.8"
+dependencies = [
+    "Flask>=3.0",
+    "waitress>=3.0",
+]
+
 [tool.vercel]
 entrypoint = "app:app"
